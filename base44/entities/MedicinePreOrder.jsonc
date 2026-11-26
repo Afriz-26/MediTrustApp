@@ -1,0 +1,208 @@
+{
+  "name": "MedicinePreOrder",
+  "type": "object",
+  "properties": {
+    "patient_email": {
+      "type": "string",
+      "description": "Email of the patient"
+    },
+    "patient_name": {
+      "type": "string"
+    },
+    "patient_phone": {
+      "type": "string"
+    },
+    "pharmacy_name": {
+      "type": "string"
+    },
+    "order_type": {
+      "type": "string",
+      "enum": [
+        "pickup",
+        "delivery"
+      ],
+      "description": "Pickup or delivery"
+    },
+    "preferred_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "preferred_time_slot": {
+      "type": "string"
+    },
+    "medicines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "medicine_id": {
+            "type": "string"
+          },
+          "medicine_name": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "price": {
+            "type": "number"
+          },
+          "stock_status": {
+            "type": "string",
+            "enum": [
+              "in_stock",
+              "will_arrive_soon",
+              "out_of_stock"
+            ]
+          }
+        }
+      }
+    },
+    "total_amount": {
+      "type": "number"
+    },
+    "delivery_address": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "accepted",
+        "preparing",
+        "ready",
+        "out_for_delivery",
+        "completed",
+        "cancelled"
+      ],
+      "default": "pending"
+    },
+    "pharmacy_notes": {
+      "type": "string"
+    },
+    "suggested_time_slot": {
+      "type": "string"
+    },
+    "onboarding_status": {
+      "type": "string",
+      "enum": [
+        "pending_onboard",
+        "onboarded",
+        "paid"
+      ],
+      "default": "pending_onboard"
+    },
+    "osm_id": {
+      "type": "string"
+    },
+    "osm_lat": {
+      "type": "number"
+    },
+    "osm_lng": {
+      "type": "number"
+    },
+    "osm_name": {
+      "type": "string"
+    },
+    "osm_address": {
+      "type": "string"
+    },
+    "payment_status": {
+      "type": "string",
+      "enum": [
+        "unpaid",
+        "paid",
+        "refunded"
+      ],
+      "default": "unpaid"
+    },
+    "payment_id": {
+      "type": "string"
+    },
+    "provider_request_id": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional notes or description of the pre-order"
+    }
+  },
+  "required": [
+    "patient_email",
+    "order_type",
+    "preferred_date",
+    "preferred_time_slot",
+    "medicines",
+    "total_amount"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "data.patient_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "data.patient_email": "{{user.email}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "pharmacy"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.patient_email": "{{user.email}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "pharmacy"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.patient_email": "{{user.email}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

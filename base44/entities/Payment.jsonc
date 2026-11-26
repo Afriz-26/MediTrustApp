@@ -1,0 +1,121 @@
+{
+  "name": "Payment",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "number"
+    },
+    "currency": {
+      "type": "string",
+      "default": "INR"
+    },
+    "payment_type": {
+      "type": "string",
+      "enum": [
+        "appointment",
+        "subscription",
+        "ad_booster",
+        "health_tracker",
+        "medicine_order",
+        "health_record_premium"
+      ]
+    },
+    "linked_entity_id": {
+      "type": "string",
+      "description": "Id of the related appointment, subscription, order, etc."
+    },
+    "linked_entity_type": {
+      "type": "string",
+      "description": "Entity name of the linked record"
+    },
+    "gateway": {
+      "type": "string",
+      "enum": [
+        "razorpay",
+        "stripe",
+        "demo"
+      ],
+      "default": "razorpay"
+    },
+    "gateway_order_id": {
+      "type": "string",
+      "description": "Order id from the payment gateway"
+    },
+    "gateway_payment_id": {
+      "type": "string",
+      "description": "Payment id returned by the gateway after success"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "paid",
+        "failed",
+        "refunded"
+      ],
+      "default": "pending"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000
+    }
+  },
+  "required": [
+    "user_email",
+    "amount",
+    "payment_type",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

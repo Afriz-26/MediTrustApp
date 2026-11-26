@@ -1,0 +1,74 @@
+{
+  "name": "Review",
+  "type": "object",
+  "properties": {
+    "provider_email": {
+      "type": "string",
+      "description": "Email of the reviewed provider (doctor or pharmacy)"
+    },
+    "provider_type": {
+      "type": "string",
+      "enum": [
+        "doctor",
+        "pharmacy",
+        "medicine"
+      ]
+    },
+    "patient_email": {
+      "type": "string",
+      "description": "Email of the patient who wrote the review"
+    },
+    "patient_name": {
+      "type": "string"
+    },
+    "appointment_id": {
+      "type": "string",
+      "description": "Linked appointment (for eligibility verification)"
+    },
+    "rating": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "comment": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "is_verified": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the review is from a verified completed appointment"
+    }
+  },
+  "required": [
+    "provider_email",
+    "provider_type",
+    "patient_email",
+    "rating"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "data.patient_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "read": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

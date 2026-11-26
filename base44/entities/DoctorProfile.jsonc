@@ -1,0 +1,171 @@
+{
+  "name": "DoctorProfile",
+  "type": "object",
+  "properties": {
+    "email": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "specialization": {
+      "type": "string",
+      "enum": [
+        "general_physician",
+        "cardiologist",
+        "dermatologist",
+        "neurologist",
+        "orthopedic",
+        "pediatrician",
+        "psychiatrist",
+        "gynecologist",
+        "ophthalmologist",
+        "ent",
+        "dentist"
+      ]
+    },
+    "qualification": {
+      "type": "string"
+    },
+    "experience_years": {
+      "type": "number"
+    },
+    "license_number": {
+      "type": "string"
+    },
+    "hospital_name": {
+      "type": "string"
+    },
+    "hospital_address": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string"
+    },
+    "lat": {
+      "type": "number"
+    },
+    "lng": {
+      "type": "number"
+    },
+    "consultation_fees": {
+      "type": "object",
+      "properties": {
+        "offline": {
+          "type": "number"
+        },
+        "chat": {
+          "type": "number"
+        },
+        "audio": {
+          "type": "number"
+        },
+        "video": {
+          "type": "number"
+        }
+      }
+    },
+    "available_slots": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "languages": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "profile_image": {
+      "type": "string"
+    },
+    "rating": {
+      "type": "number"
+    },
+    "is_verified": {
+      "type": "boolean",
+      "default": false
+    },
+    "verification_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "default": "pending"
+    },
+    "subscription_tier": {
+      "type": "string",
+      "enum": [
+        "none",
+        "basic",
+        "pro",
+        "elite"
+      ],
+      "default": "none"
+    },
+    "total_patients": {
+      "type": "number",
+      "default": 0
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000
+    }
+  },
+  "required": [
+    "email",
+    "name",
+    "specialization"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "data.email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "read": null,
+    "update": {
+      "$or": [
+        {
+          "data.email": "{{user.email}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.email": "{{user.email}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

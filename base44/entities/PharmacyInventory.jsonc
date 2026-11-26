@@ -1,0 +1,87 @@
+{
+  "name": "PharmacyInventory",
+  "type": "object",
+  "properties": {
+    "pharmacy_email": {
+      "type": "string",
+      "description": "Email of the verified pharmacy that owns this inventory entry"
+    },
+    "medicine_id": {
+      "type": "string",
+      "description": "Reference to the Medicine master catalog record id"
+    },
+    "medicine_name": {
+      "type": "string",
+      "description": "Denormalized medicine name for quick display"
+    },
+    "stock_quantity": {
+      "type": "number",
+      "default": 0,
+      "description": "Units currently in stock"
+    },
+    "price": {
+      "type": "number",
+      "description": "Selling price set by the pharmacy in INR"
+    },
+    "in_stock": {
+      "type": "boolean",
+      "default": true
+    },
+    "expiry_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Expiry date of the batch (optional)"
+    },
+    "batch_number": {
+      "type": "string"
+    },
+    "last_updated": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "pharmacy_email",
+    "medicine_id",
+    "medicine_name"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "data.pharmacy_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "read": {},
+    "update": {
+      "$or": [
+        {
+          "data.pharmacy_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.pharmacy_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

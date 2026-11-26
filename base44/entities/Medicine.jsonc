@@ -1,0 +1,87 @@
+{
+  "name": "Medicine",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "generic": {
+      "type": "string"
+    },
+    "manufacturer": {
+      "type": "string"
+    },
+    "composition": {
+      "type": "string",
+      "description": "Active ingredients / salt composition"
+    },
+    "category": {
+      "type": "string"
+    },
+    "rx": {
+      "type": "boolean",
+      "default": false
+    },
+    "uses": {
+      "type": "string"
+    },
+    "warnings": {
+      "type": "string",
+      "description": "Safety warnings and contraindications"
+    },
+    "side_effects": {
+      "type": "string",
+      "description": "Known side effects"
+    },
+    "dosage": {
+      "type": "string",
+      "description": "Typical dosage instructions"
+    },
+    "symptoms": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "mrp_range": {
+      "type": "string",
+      "description": "Typical MRP range in INR"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "Product packaging image URL"
+    },
+    "source": {
+      "type": "string",
+      "description": "Dataset source e.g. curated_open, openfda, rxnorm, cdsc"
+    },
+    "source_id": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

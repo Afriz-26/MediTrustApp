@@ -1,0 +1,87 @@
+{
+  "name": "ProviderExternalSource",
+  "type": "object",
+  "properties": {
+    "external_provider_id": {
+      "type": "string",
+      "description": "Unique id from source, e.g. osm:node/123"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "osm"
+      ],
+      "default": "osm"
+    },
+    "provider_type": {
+      "type": "string",
+      "enum": [
+        "doctor",
+        "pharmacy"
+      ]
+    },
+    "name": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "lat": {
+      "type": "number"
+    },
+    "lng": {
+      "type": "number"
+    },
+    "state": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "pincode": {
+      "type": "string"
+    },
+    "request_count": {
+      "type": "number",
+      "default": 1
+    },
+    "first_requested_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "latest_request_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "contacted",
+        "invited",
+        "approved",
+        "rejected"
+      ],
+      "default": "pending"
+    },
+    "linked_profile_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "external_provider_id",
+    "source",
+    "provider_type",
+    "name"
+  ],
+  "rls": {
+    "create": {},
+    "read": {},
+    "update": {},
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -1,0 +1,143 @@
+{
+  "name": "ProviderRequest",
+  "type": "object",
+  "properties": {
+    "request_type": {
+      "type": "string",
+      "enum": [
+        "doctor",
+        "pharmacy"
+      ],
+      "description": "Type of provider requested"
+    },
+    "osm_id": {
+      "type": "string",
+      "description": "OpenStreetMap node id of the provider"
+    },
+    "osm_name": {
+      "type": "string"
+    },
+    "osm_address": {
+      "type": "string"
+    },
+    "osm_lat": {
+      "type": "number"
+    },
+    "osm_lng": {
+      "type": "number"
+    },
+    "osm_tags": {
+      "type": "object",
+      "description": "Raw OSM tags for context"
+    },
+    "external_source": {
+      "type": "string",
+      "enum": [
+        "osm"
+      ],
+      "default": "osm"
+    },
+    "external_provider_id": {
+      "type": "string",
+      "description": "Dedup key, e.g. osm:node/123"
+    },
+    "requested_by_email": {
+      "type": "string",
+      "description": "Email of the user who requested onboarding"
+    },
+    "requested_by_name": {
+      "type": "string"
+    },
+    "reason": {
+      "type": "string",
+      "description": "Why the patient wants this provider onboarded"
+    },
+    "state": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "pincode": {
+      "type": "string"
+    },
+    "linked_entity_type": {
+      "type": "string",
+      "enum": [
+        "Appointment",
+        "MedicinePreOrder",
+        "none"
+      ]
+    },
+    "linked_entity_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "contacted",
+        "invited",
+        "registered",
+        "verification_pending",
+        "approved",
+        "rejected",
+        "closed"
+      ],
+      "default": "pending"
+    },
+    "linked_profile_id": {
+      "type": "string",
+      "description": "Id of created DoctorProfile/PharmacyProfile once onboarded"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "request_type",
+    "osm_id",
+    "osm_name",
+    "requested_by_email",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "data.requested_by_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "data.requested_by_email": "{{user.email}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

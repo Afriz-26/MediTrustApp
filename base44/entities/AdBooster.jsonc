@@ -1,0 +1,120 @@
+{
+  "name": "AdBooster",
+  "type": "object",
+  "properties": {
+    "provider_email": {
+      "type": "string"
+    },
+    "provider_type": {
+      "type": "string",
+      "enum": [
+        "doctor",
+        "pharmacy",
+        "skincare_store"
+      ]
+    },
+    "booster_type": {
+      "type": "string",
+      "enum": [
+        "featured_profile",
+        "search_booster",
+        "premium_visibility",
+        "homepage_promotion",
+        "city_spotlight"
+      ]
+    },
+    "amount": {
+      "type": "number"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "impressions": {
+      "type": "number",
+      "default": 0
+    },
+    "clicks": {
+      "type": "number",
+      "default": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "active",
+        "expired",
+        "cancelled"
+      ],
+      "default": "pending"
+    },
+    "payment_id": {
+      "type": "string",
+      "description": "Linked Payment record id"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000
+    }
+  },
+  "required": [
+    "provider_email",
+    "provider_type",
+    "booster_type",
+    "amount",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "data.provider_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "data.provider_email": "{{user.email}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.provider_email": "{{user.email}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

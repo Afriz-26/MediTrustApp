@@ -1,0 +1,107 @@
+{
+  "name": "DoctorSchedule",
+  "type": "object",
+  "properties": {
+    "doctor_email": {
+      "type": "string",
+      "description": "Email of the doctor who owns this schedule"
+    },
+    "working_days": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "description": "Day-of-week numbers: 0=Sun, 1=Mon, ..., 6=Sat"
+    },
+    "morning_start": {
+      "type": "string",
+      "description": "Morning session start in 24h HH:mm format"
+    },
+    "morning_end": {
+      "type": "string",
+      "description": "Morning session end in 24h HH:mm format"
+    },
+    "evening_start": {
+      "type": "string",
+      "description": "Evening session start in 24h HH:mm format (optional)"
+    },
+    "evening_end": {
+      "type": "string",
+      "description": "Evening session end in 24h HH:mm format (optional)"
+    },
+    "slot_duration_minutes": {
+      "type": "number",
+      "default": 30,
+      "description": "Duration of each appointment slot in minutes"
+    },
+    "max_per_slot": {
+      "type": "number",
+      "default": 1,
+      "description": "Maximum patients allowed per time slot"
+    },
+    "daily_token_start": {
+      "type": "number",
+      "default": 1,
+      "description": "Starting token number each day"
+    },
+    "walk_in_reserve_pct": {
+      "type": "number",
+      "default": 0,
+      "description": "Percentage of each slot reserved for walk-in patients"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "blocked_dates": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "date"
+      },
+      "description": "Dates the doctor is unavailable (holidays, leave)"
+    }
+  },
+  "required": [
+    "doctor_email"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "data.doctor_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "read": {},
+    "update": {
+      "$or": [
+        {
+          "data.doctor_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.doctor_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
