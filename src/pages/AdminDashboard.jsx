@@ -17,9 +17,11 @@ import FinancePanel from '@/components/admin/FinancePanel';
 import DirectoryManager from '@/components/admin/DirectoryManager';
 import AdminAlerts from '@/components/admin/AdminAlerts';
 import AdminPeople from '@/components/admin/AdminPeople';
+import AdminDemand from '@/components/admin/AdminDemand';
 
 const TABS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+  { id: 'demand', label: 'Demand', icon: TrendingUp },
   { id: 'patients', label: 'Patients', icon: Users },
   { id: 'doctors', label: 'Doctors', icon: Stethoscope },
   { id: 'pharmacies', label: 'Pharmacies', icon: Pill },
@@ -387,6 +389,7 @@ function AdminDashboardContent() {
               </div>
             )}
 
+            {tab === 'demand' && <AdminDemand />}
             {tab === 'patients' && <AdminPeople kind="patients" />}
             {tab === 'doctors' && <AdminPeople kind="doctors" />}
             {tab === 'pharmacies' && <AdminPeople kind="pharmacies" />}

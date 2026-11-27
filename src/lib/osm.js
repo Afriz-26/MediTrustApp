@@ -443,7 +443,7 @@ export async function fetchNearbyProviders(lat, lng, type, radius = 8000, { forc
   const cacheKey = `osm_v7_${providerType}_${lat.toFixed(3)}_${lng.toFixed(3)}_${radius}`;
   if (!forceRefresh) {
     try {
-      const cached = sessionStorage.getItem(cacheKey);
+      const cached = localStorage.getItem(cacheKey);
       if (cached) {
         const parsed = JSON.parse(cached);
         if (parsed && parsed.expiry > Date.now()) return parsed.data;
@@ -482,9 +482,9 @@ export async function fetchNearbyProviders(lat, lng, type, radius = 8000, { forc
       throw new Error("The map servers did not respond. Check your connection or ad-blocker, then retry.");
     }
     try {
-      sessionStorage.setItem(cacheKey, JSON.stringify({
+      localStorage.setItem(cacheKey, JSON.stringify({
         data: list,
-        expiry: Date.now() + (list.length ? 10 : 2) * 60 * 1000,
+        expiry: Date.now() + (list.length ? 6 * 60 : 2) * 60 * 1000,
       }));
     } catch (error) {
       console.warn("Nearby pharmacy results could not be cached.", error);
@@ -522,7 +522,7 @@ export async function fetchNearbyProviders(lat, lng, type, radius = 8000, { forc
 
   if (list.length > 0) {
     try {
-      sessionStorage.setItem(cacheKey, JSON.stringify({ data: list, expiry: Date.now() + 10 * 60 * 1000 }));
+      localStorage.setItem(cacheKey, JSON.stringify({ data: list, expiry: Date.now() + 6 * 60 * 60 * 1000 }));
     } catch (error) {
       console.warn("Nearby provider results could not be cached.", error);
     }

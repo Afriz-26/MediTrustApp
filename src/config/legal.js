@@ -12,7 +12,7 @@ export const COMPANY = {
   phoneHref: '+918328620294',
   grievanceOfficer: 'Shaik Afriz',
   // Bump this whenever any legal page text changes.
-  lastUpdated: '24 November 2026',
+  lastUpdated: '27 November 2026',
 };
 
 export default COMPANY;
