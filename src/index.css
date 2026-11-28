@@ -111,3 +111,25 @@
   .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
   .header-safe { padding-top: calc(env(safe-area-inset-top) + 3rem); }
 }
+
+/* ── Small phones: long words, emails and addresses wrap inside their box instead of floating outside it ── */
+@layer base {
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6, p, li, label, td, th, dd, dt {
+    overflow-wrap: break-word;
+  }
+
+  /* let flex children shrink so their text wraps instead of pushing past the screen edge */
+  .flex > *:not(svg):not(img) {
+    min-width: 0;
+  }
+
+  img, video, canvas {
+    max-width: 100%;
+  }
+}

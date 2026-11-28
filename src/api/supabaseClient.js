@@ -868,6 +868,40 @@ const ChatMessage = entity({
   },
 });
 
+// ───────────────────────── HealthLog (patient's health records and uploaded files) ─────────────────────────
+const HEALTH_BUCKET = 'health-records';
+const healthFromRow = (r, email) => ({
+  id: r.id, patient_email: email, log_type: 'note', title: r.title || 'Record', description: r.notes || '',
+  date: dateOnly(r.created_at), file_url: r.file_path || '', file_type: r.record_type || 'other',
+  file_size: Number(r.file_size) || 0, created_date: r.created_at,
+});
+const HealthLog = entity({
+  readAll: async () => {
+    const m = await me();
+    if (!m) return [];
+    const rows = unwrap(await supabase.from('health_records').select('*').eq('patient_id', m.id).order('created_at', { ascending: false }).limit(500));
+    return rows.map((r) => healthFromRow(r, m.email));
+  },
+  create: async (d) => {
+    const m = await me();
+    if (!m) throw new Error('Sign in before saving a record.');
+    const created = unwrap(await supabase.from('health_records').insert({
+      patient_id: m.id,
+      record_type: ['prescription', 'lab_report', 'other'].includes(d.file_type) ? d.file_type : 'other',
+      title: d.title, notes: d.description || null, file_path: d.file_url || null, file_size: d.file_size || 0,
+    }).select().single());
+    return healthFromRow(created, m.email);
+  },
+  update: async (id, d) => ({ id, ...d }),
+  remove: async (id) => {
+    if (!UUID_RE.test(id)) return {};
+    const { data: row } = await supabase.from('health_records').select('file_path').eq('id', id).maybeSingle();
+    if (row?.file_path) await supabase.storage.from(HEALTH_BUCKET).remove([row.file_path]);
+    unwrap(await supabase.from('health_records').delete().eq('id', id));
+    return {};
+  },
+});
+
 // ───────────────────────── entity registry ─────────────────────────
 // DirectoryListing: MediTrust's own list of local clinics/pharmacies that are not on the platform yet (fills OpenStreetMap gaps in small towns).
 // Business details only (name, phone, address). Everyone signed in can read active ones; only admins can write (enforced by RLS).
@@ -897,7 +931,7 @@ const DirectoryListing = entity({
 
 const registry = {
   UserProfile, DoctorProfile, PharmacyProfile, DoctorSchedule, Appointment, Prescription, Notification,
-  Medicine, PharmacyInventory, MedicinePreOrder, ProviderRequest, Subscription, ChatMessage, DirectoryListing,
+  Medicine, PharmacyInventory, MedicinePreOrder, ProviderRequest, Subscription, ChatMessage, DirectoryListing, HealthLog,
 };
 const entities = new Proxy(registry, {
   get: (t, name) => t[name] || (t[name] = inertEntity()), // Payment, AdBooster, Review, HealthLog, ... (v1: off)
@@ -1028,8 +1062,26 @@ async function invokeAi(payload) {
 const integrations = {
   Core: {
     UploadFile: async () => ({ file_url: '' }),
-    UploadPrivateFile: async () => ({ file_uri: '' }),
-    CreateFileSignedUrl: async () => ({ signed_url: '' }),
+    UploadPrivateFile: async ({ file } = {}) => {
+      const u = await sessionUser();
+      if (!u) throw new Error('Sign in before uploading a file.');
+      if (!file) throw new Error('Choose a file first.');
+      if (file.size > 10 * 1024 * 1024) throw new Error('This file is larger than 10 MB. Please choose a smaller file or take a lower-quality photo.');
+      const okByType = /^(application\/pdf|image\/(jpeg|png|webp|heic|heif))$/i.test(file.type || '');
+      const okByName = /\.(pdf|jpe?g|png|webp|heic|heif)$/i.test(file.name || '');
+      if (!okByType && !(file.type === '' && okByName)) throw new Error('Only PDF, JPG, PNG, WEBP or HEIC files can be uploaded.');
+      const safe = String(file.name || 'file').replace(/[^\w.\-]+/g, '_').slice(-80);
+      const path = `${u.id}/${Date.now()}-${safe}`;
+      const { error } = await supabase.storage.from(HEALTH_BUCKET).upload(path, file, { contentType: file.type || undefined, upsert: false });
+      if (error) throw new Error(error.message || 'The upload failed. Please try again.');
+      return { file_uri: path };
+    },
+    CreateFileSignedUrl: async ({ file_uri, expires_in = 300 } = {}) => {
+      if (!file_uri) return { signed_url: '' };
+      const { data, error } = await supabase.storage.from(HEALTH_BUCKET).createSignedUrl(file_uri, expires_in);
+      if (error) throw new Error(error.message);
+      return { signed_url: data.signedUrl };
+    },
     // Calls the server function that holds the AI key (added in the next step). Never put an AI key in the browser.
     InvokeLLM: async (payload) => invokeAi(payload),
     _InvokeLLMUnused: async (payload) => {

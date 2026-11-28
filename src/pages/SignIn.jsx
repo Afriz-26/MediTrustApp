@@ -2,7 +2,7 @@ import { db } from '@/api/client';
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, User, Stethoscope, Building2, LogIn, UserPlus, ShieldCheck, Loader2 } from 'lucide-react';
+import { ArrowLeft, User, Stethoscope, Building2, LogIn, UserPlus, ShieldCheck, Loader2, Eye, EyeOff } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,7 @@ function SignInContent() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPw, setShowPw] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -97,7 +98,17 @@ function SignInContent() {
         }
         // otherwise the route guard moves a signed-in user forward automatically
       } else {
-        const u = await signIn({ email: email.trim(), password });
+        let u;
+        try {
+          u = await signIn({ email: email.trim(), password });
+        } catch (firstErr) {
+          // Phone keyboards sometimes add a space after the last word; retry once without it.
+          if (/invalid login/i.test(String(firstErr.message || '')) && password !== password.trim()) {
+            u = await signIn({ email: email.trim(), password: password.trim() });
+          } else {
+            throw firstErr;
+          }
+        }
         if (u?.role === 'admin') navigate(createPageUrl('AdminDashboard'));
       }
     } catch (err) {
@@ -169,8 +180,13 @@ function SignInContent() {
             {isSignup && (
               <Input placeholder={selectedRole === 'pharmacy' ? 'Pharmacy or owner name' : 'Full name'} value={fullName} onChange={(e) => setFullName(e.target.value)} className="h-12 rounded-xl" autoComplete="name" />
             )}
-            <Input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="h-12 rounded-xl" autoComplete="email" />
-            <Input type="password" placeholder={isSignup ? 'Password (8+ characters, letters and numbers)' : 'Password'} value={password} onChange={(e) => setPassword(e.target.value)} className="h-12 rounded-xl" autoComplete={isSignup ? 'new-password' : 'current-password'} />
+            <Input type="email" inputMode="email" autoCapitalize="none" autoCorrect="off" spellCheck={false} placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="h-12 rounded-xl" autoComplete="email" />
+            <div className="relative">
+              <Input type={showPw ? 'text' : 'password'} autoCapitalize="none" autoCorrect="off" spellCheck={false} placeholder={isSignup ? 'Password (8+ characters, letters and numbers)' : 'Password'} value={password} onChange={(e) => setPassword(e.target.value)} className="h-12 rounded-xl pr-12" autoComplete={isSignup ? 'new-password' : 'current-password'} />
+              <button type="button" onClick={() => setShowPw((v) => !v)} aria-label={showPw ? 'Hide password' : 'Show password'} className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400">
+                {showPw ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
 
           {isSignup && (

@@ -3,6 +3,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import NavigationTracker from '@/lib/NavigationTracker'
 import NotificationListener from '@/components/common/NotificationListener'
+import InstallPrompt from '@/components/common/InstallPrompt'
 import { ThemeProvider } from 'next-themes'
 import { useAndroidBack } from '@/hooks/useAndroidBack'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -198,6 +199,7 @@ function App() {
           <Router>
             <NavigationTracker />
             <NotificationListener />
+            <InstallPrompt />
             <AuthenticatedApp />
           </Router>
           <Toaster />

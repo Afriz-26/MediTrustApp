@@ -432,9 +432,7 @@ function HealthTrackerContent() {
         setTierError('Your plan details could not be loaded. Health records are still available.');
       }
       const [data, prescriptionData] = await Promise.all([
-        isMockBackend
-          ? db.entities.HealthLog.filter({ patient_email: me.email }, '-date', 50)
-          : Promise.resolve([]),
+        db.entities.HealthLog.filter({ patient_email: me.email }, '-date', 200),
         db.entities.Prescription.filter({ patient_email: me.email }, { sort: '-created_date', limit: 100 }),
       ]);
       setLogs(data);
@@ -577,7 +575,7 @@ function HealthTrackerContent() {
         {/* ── RECORDS TAB ── */}
         {tab === TAB_RECORDS && (
           <>
-            {isMockBackend && <StorageUsageBar used={usedBytes} limit={tierInfo.limit} tierLabel={tierInfo.label} />}
+            <StorageUsageBar used={usedBytes} limit={tierInfo.limit} tierLabel={tierInfo.label} />
 
             {isMockBackend && features.premiumHealth && tier === 'free' && (
               <button
@@ -593,7 +591,7 @@ function HealthTrackerContent() {
               </button>
             )}
 
-            {isMockBackend && <div className="relative">
+            <div className="relative">
               <Button
                 onClick={() => storageFull && features.premiumHealth ? setShowUpgrade(true) : setShowUpload(true)}
                 disabled={storageFull && !features.premiumHealth}
@@ -606,14 +604,14 @@ function HealthTrackerContent() {
                   <Lock className="w-5 h-5 text-white/80" />
                 </div>
               )}
-            </div>}
+            </div>
 
-            {isMockBackend && <div className="flex gap-2 overflow-x-auto pb-1">
+            <div className="flex gap-2 overflow-x-auto pb-1">
               {[
                 { key: 'all', label: 'All Records' },
                 { key: 'prescription', label: 'Prescriptions' },
                 { key: 'lab_report', label: 'Lab Reports' },
-                { key: 'visit', label: 'My Visits' },
+                ...(isMockBackend ? [{ key: 'visit', label: 'My Visits' }] : []),
               ].map(s => (
                 <button
                   key={s.key}
@@ -623,7 +621,7 @@ function HealthTrackerContent() {
                   {s.label}
                 </button>
               ))}
-            </div>}
+            </div>
 
             {loading ? <p role="status" className="text-center text-gray-400 text-sm py-8">Loading...</p> : loadError ? (
               <DataError message={loadError} onRetry={loadLogs} />
